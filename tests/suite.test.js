@@ -11,20 +11,15 @@
  * limitations under the License.
  */
 
-import nodeResolve from "rollup-plugin-node-resolve";
-import { terser } from "rollup-plugin-terser";
+import importFromWorker from "/base/dist/import-from-worker.js";
 
-export default {
-  input: "src/index.js",
-  output: {
-    file: "dist/import-from-worker.js",
-    format: "esm"
-  },
-  plugins: [
-    nodeResolve(),
-    terser({
-      mangle: true,
-      compress: true
-    })
-  ]
-};
+describe("importFromWorker", function() {
+  beforeEach(function() {});
+
+  it("gives you access to the module’s exports", async function() {
+    const { add } = await importFromWorker(
+      "/base/tests/fixtures/arithmetic.js"
+    );
+    expect(await add(40, 2)).to.equal(42);
+  });
+});

@@ -11,20 +11,6 @@
  * limitations under the License.
  */
 
-import nodeResolve from "rollup-plugin-node-resolve";
-import { terser } from "rollup-plugin-terser";
-
-export default {
-  input: "src/index.js",
-  output: {
-    file: "dist/import-from-worker.js",
-    format: "esm"
-  },
-  plugins: [
-    nodeResolve(),
-    terser({
-      mangle: true,
-      compress: true
-    })
-  ]
-};
+export function add(a, b) {
+  return a + b;
+}
