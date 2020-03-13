@@ -12,19 +12,26 @@ function expectMessage(target, payload) {
   });
 }
 
-export class ESMWorker extends Worker {
-  constructor(path, { type, name } = {}) {
-    if (type !== "module") {
-      throw Error(`ESMWorker can only be used with {type: "module"}`);
+export const workerSymbol = Symbol();
+export default async function importFromWorker(path, { name } = {}) {
+  const worker = new Worker(import.meta.url, { type: "module", name });
+  await expectMessage(worker, "waiting");
+  worker.postMessage(path);
+  await expectMessage(worker, "ready");
+  const api = wrap(worker);
+  return new Proxy(api, {
+    get(target, prop) {
+      if (prop === workerSymbol) {
+        return worker;
+      }
+      return target[prop];
     }
-    super(import.meta.url, { type: "module", name });
-    this.ready = expectMessage(this, "ready");
-    this.postMessage(path);
-    this.exports = wrap(this);
-  }
+  });
 }
+export { importFromWorker };
 
 async function run() {
+  postMessage("waiting");
   const { data } = await expectMessage(self);
   const module = await import(data);
   postMessage("ready");
