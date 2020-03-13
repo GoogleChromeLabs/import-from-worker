@@ -1,0 +1,14 @@
+<!doctype html>
+<script type="module">
+  import {ESMWorker} from "./esmworker.js";
+
+  async function run() {
+    const worker = new ESMWorker("./worker.js", {type: "module"});
+    await worker.ready;
+    await worker
+      .exports
+      .log();
+    console.log(await worker.exports.add(40, 2));
+  }
+  run();
+</script>
