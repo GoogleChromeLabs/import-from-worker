@@ -22,4 +22,9 @@ describe("importFromWorker", function() {
     );
     expect(await add(40, 2)).to.equal(42);
   });
+
+  it("works with relative paths", async function() {
+    const { add } = await importFromWorker("./fixtures/arithmetic.js");
+    expect(await add(40, 2)).to.equal(42);
+  });
 });

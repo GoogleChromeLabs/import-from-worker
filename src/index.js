@@ -25,14 +25,27 @@ function expectMessage(target, payload) {
   });
 }
 
+// I, Surma, take no responsibility. This is Jason’s invention.
+// It’s disgusting, uses RegExps and solves the problem at hand,
+// which is fairly on-brand.
+function getBase() {
+  let relativeTo = location.href;
+  try {
+    relativeTo = Error()
+      .stack.split("\n")[3]
+      .match(/ \((.+):[^:]+:[^:]+\)$/)[1];
+  } catch (e) {}
+  return relativeTo;
+}
+
 export const workerSymbol = Symbol();
-export default async function importFromWorker(path, { name } = {}) {
+export default async function importFromWorker(
+  path,
+  { name, base = getBase() } = {}
+) {
   const worker = new Worker(import.meta.url, { type: "module", name });
   await expectMessage(worker, "waiting");
-  if (path instanceof URL) {
-    path = path.toString();
-  }
-  worker.postMessage(path);
+  worker.postMessage(new URL(path, base).toString());
   await expectMessage(worker, "ready");
   const api = wrap(worker);
   return new Proxy(api, {
