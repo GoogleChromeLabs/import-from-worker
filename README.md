@@ -39,7 +39,9 @@ Why yes you can! The module exports a `workerSymbol` that can be used thusly:
 ```js
 import importFromWorker, { workerSymbol } from "import-from-worker";
 
-const module = await importFromWorker("./service.js");
+// The path is relative to the `import-from-worker` module, so it is recommended
+// to explicitely resolve the path:
+const module = await importFromWorker(new URL("./service.js", import.meta.url));
 const worker = module[workerSymbol];
 // You could also use destructuring:
 // const {[workerSymbol]: worker, add, subtract} = await importFromWorker("./service.js");

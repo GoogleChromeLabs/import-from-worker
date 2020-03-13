@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-import { wrap, expose } from "/node_modules/comlink/dist/esm/comlink.mjs";
+import { wrap, expose } from "comlink";
 
 function expectMessage(target, payload) {
   return new Promise(resolve => {
@@ -29,6 +29,9 @@ export const workerSymbol = Symbol();
 export default async function importFromWorker(path, { name } = {}) {
   const worker = new Worker(import.meta.url, { type: "module", name });
   await expectMessage(worker, "waiting");
+  if (path instanceof URL) {
+    path = path.toString();
+  }
   worker.postMessage(path);
   await expectMessage(worker, "ready");
   const api = wrap(worker);

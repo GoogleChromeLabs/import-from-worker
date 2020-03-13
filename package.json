@@ -4,8 +4,15 @@
   "description": "",
   "author": "Surma <surma@surma.dev>",
   "license": "Apache-2.0",
+  "scripts": {
+    "build": "rollup -c",
+    "serve": "http-server -c0 ."
+  },
   "dependencies": {
-    "comlink": "^4.2.0"
+    "comlink": "^4.2.0",
+    "rollup": "^2.0.6",
+    "rollup-plugin-node-resolve": "^5.2.0",
+    "rollup-plugin-terser": "^5.3.0"
   },
   "devDependencies": {
     "http-server": "^0.12.1",
