@@ -3,7 +3,7 @@
   import importFromWorker, {workerSymbol} from "./import-from-worker.js";
 
   async function run() {
-    const {[workerSymbol]: worker, add, log} = await importFromWorker("./service.js");
+    const {add, log} = await importFromWorker("./service.js");
     await log();
     console.log(await add(40, 2));
   }
