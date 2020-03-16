@@ -11,6 +11,13 @@
  * limitations under the License.
  */
 
+const supportedBrowsers = [
+  "ChromeHeadless",
+  "ChromeCanaryHeadless",
+  "FirefoxHeadless",
+  "Safari"
+];
+
 module.exports = function(config) {
   const configuration = {
     basePath: "",
@@ -41,12 +48,15 @@ module.exports = function(config) {
       usePhantomJS: false,
       preferHeadless: true,
       postDetection: availableBrowsers => {
+        console.log(availableBrowsers);
         if (process.env.INSIDE_DOCKER) {
           return ["DockerChrome"];
         } else if (process.env.CHROME_ONLY) {
           return ["ChromeHeadless"];
         } else {
-          return availableBrowsers;
+          return availableBrowsers.filter(browser =>
+            supportedBrowsers.includes(browser)
+          );
         }
       }
     },

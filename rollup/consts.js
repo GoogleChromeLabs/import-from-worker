@@ -11,33 +11,24 @@
  * limitations under the License.
  */
 
-import nodeResolve from "rollup-plugin-node-resolve";
-import { terser } from "rollup-plugin-terser";
+const IDENTIFIER = "consts:";
 
-import consts from "./rollup/consts.js";
-
-export default [
-  {
-    withPolyfill: true
-  },
-  {
-    withPolyfill: false
-  }
-].map(({ withPolyfill }) => {
-  const file = `dist/import-from-worker${withPolyfill ? ".shimmed" : ""}.js`;
+export default function(consts = {}) {
   return {
-    input: "src/index.js",
-    output: {
-      format: "esm",
-      file
+    name: "consts",
+    resolveId(id) {
+      if (id !== IDENTIFIER) {
+        return;
+      }
+      return id;
     },
-    plugins: [
-      nodeResolve(),
-      consts({ withPolyfill })
-      // terser({
-      //   mangle: true,
-      //   compress: true
-      // })
-    ]
+    load(id) {
+      if (id !== IDENTIFIER) {
+        return;
+      }
+      return Object.entries(consts)
+        .map(([key, value]) => `export const ${key}=${JSON.stringify(value)}`)
+        .join("\n");
+    }
   };
-});
+}

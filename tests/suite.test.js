@@ -11,9 +11,31 @@
  * limitations under the License.
  */
 
-import importFromWorker from "/base/dist/import-from-worker.js";
+let importFromWorker;
 
 describe("importFromWorker", function() {
+  before(async function() {
+    let hasModulesInWorkerSupport = false;
+    const opts = {
+      get type() {
+        hasModulesInWorkerSupport = true;
+      }
+    };
+    const emptyBlob = URL.createObjectURL(
+      new Blob([""], { type: "text/javascript" })
+    );
+    new Worker(emptyBlob, opts).terminate();
+    if (hasModulesInWorkerSupport) {
+      importFromWorker = await import("/base/dist/import-from-worker.js").then(
+        m => m.default
+      );
+    } else {
+      importFromWorker = await import(
+        "/base/dist/import-from-worker.shimmed.js"
+      ).then(m => m.default);
+    }
+  });
+
   beforeEach(function() {});
 
   it("gives you access to the module’s exports", async function() {

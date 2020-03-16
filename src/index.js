@@ -11,7 +11,11 @@
  * limitations under the License.
  */
 
+import { withPolyfill } from "consts:";
+
 import { wrap, expose } from "comlink";
+
+import $import from "./import-polyfill.js";
 
 function expectMessage(target, payload) {
   return new Promise(resolve => {
@@ -28,22 +32,33 @@ function expectMessage(target, payload) {
 // I, Surma, take no responsibility. This is Jason’s invention.
 // It’s disgusting, uses RegExps and solves the problem at hand,
 // which is fairly on-brand.
+const httpUrlRegexp = /([a-z]+:\/\/[^\/]+\/[^:]+)/;
 function getBase() {
   let relativeTo = location.href;
   try {
     relativeTo = Error()
       .stack.split("\n")[3]
-      .match(/ \((.+):[^:]+:[^:]+\)$/)[1];
+      .match(httpUrlRegexp)[1];
   } catch (e) {}
   return relativeTo;
 }
 
-export const workerSymbol = Symbol();
-export default async function importFromWorker(
-  path,
-  { name, base = getBase() } = {}
-) {
-  const worker = new Worker(import.meta.url, { type: "module", name });
+function getCurrentFile() {
+  let relativeTo = location.href;
+  try {
+    relativeTo = Error()
+      .stack.split("\n")[1]
+      .match(httpUrlRegexp)[1];
+  } catch (e) {}
+  return relativeTo;
+}
+
+const workerSymbol = Symbol();
+async function importFromWorker(path, { name, base = getBase() } = {}) {
+  const type = withPolyfill ? "" : "module";
+  const workerFile = getCurrentFile();
+  console.log("Booting worker", { type, workerFile });
+  const worker = new Worker(workerFile, { type, name });
   await expectMessage(worker, "waiting");
   worker.postMessage(new URL(path, base).toString());
   await expectMessage(worker, "ready");
@@ -57,9 +72,11 @@ export default async function importFromWorker(
     }
   });
 }
-export { importFromWorker };
 
-async function run() {
+async function initWorker() {
+  if (withPolyfill) {
+    self.import = $import;
+  }
   postMessage("waiting");
   const { data } = await expectMessage(self);
   const module = await import(data);
@@ -69,5 +86,8 @@ async function run() {
 
 const isWorker = !("document" in self);
 if (isWorker) {
-  run();
+  initWorker();
 }
+
+export { workerSymbol, importFromWorker };
+export default importFromWorker;
