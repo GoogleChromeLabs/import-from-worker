@@ -11,6 +11,8 @@
  * limitations under the License.
  */
 
+const supportedBrowsers = ["ChromeHeadless", "ChromeCanaryHeadless"];
+
 module.exports = function(config) {
   const configuration = {
     basePath: "",
@@ -46,7 +48,9 @@ module.exports = function(config) {
         } else if (process.env.CHROME_ONLY) {
           return ["ChromeHeadless"];
         } else {
-          return availableBrowsers;
+          return availableBrowsers.filter(browser =>
+            supportedBrowsers.includes(browser)
+          );
         }
       }
     },
