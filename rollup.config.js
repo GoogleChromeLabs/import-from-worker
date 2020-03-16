@@ -28,7 +28,8 @@ export default [
   return {
     input: "src/index.js",
     output: {
-      format: "esm",
+      format: "iife",
+      name: "importFromWorker",
       file
     },
     plugins: [

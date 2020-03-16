@@ -53,8 +53,8 @@ function getCurrentFile() {
   return relativeTo;
 }
 
-const workerSymbol = Symbol();
-async function importFromWorker(path, { name, base = getBase() } = {}) {
+export const workerSymbol = Symbol();
+export async function importFromWorker(path, { name, base = getBase() } = {}) {
   const type = withPolyfill ? "" : "module";
   const workerFile = getCurrentFile();
   console.log("Booting worker", { type, workerFile });
@@ -79,15 +79,17 @@ async function initWorker() {
   }
   postMessage("waiting");
   const { data } = await expectMessage(self);
+  console.log("loading", { data });
   const module = await import(data);
   postMessage("ready");
   expose(module);
 }
 
+importFromWorker.workerSymbol = workerSymbol;
+self.importFromWorker = importFromWorker;
+
 const isWorker = !("document" in self);
 if (isWorker) {
+  console.log("initing worker!");
   initWorker();
 }
-
-export { workerSymbol, importFromWorker };
-export default importFromWorker;

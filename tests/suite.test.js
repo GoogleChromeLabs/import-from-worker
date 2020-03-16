@@ -27,12 +27,12 @@ describe("importFromWorker", function() {
     new Worker(emptyBlob, opts).terminate();
     if (hasModulesInWorkerSupport) {
       importFromWorker = await import("/base/dist/import-from-worker.js").then(
-        m => m.default
+        m => self.importFromWorker
       );
     } else {
       importFromWorker = await import(
         "/base/dist/import-from-worker.shimmed.js"
-      ).then(m => m.default);
+      ).then(m => self.importFromWorker);
     }
   });
 
