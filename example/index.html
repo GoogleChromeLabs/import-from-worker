@@ -1,9 +1,9 @@
 <!doctype html>
 <script type="module">
-  import importFromWorker, {workerSymbol} from "../dist/index.js";
+  import importFromWorker, {workerSymbol} from "../dist/import-from-worker.js";
 
   async function run() {
-    const {add, log} = await importFromWorker(new URL("./service.js", import.meta.url));
+    const {add, log} = await importFromWorker("./service.js");
     await log();
     console.log(await add(40, 2));
   }

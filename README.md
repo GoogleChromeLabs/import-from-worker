@@ -4,6 +4,8 @@ It’s like `import()`, but runs the module in a worker.
 
 This library is a love-child of [@_developit] and [@dassurma].
 
+**Requires [modules in workers]!**
+
 ## Usage
 
 ```js
@@ -30,9 +32,7 @@ console.log(await add(40, 2));
 
 ### How does it work?
 
-This library is really just a small layer on top of [Comlink] and Workers with ES modules (i.e. `new Worker(file, {type: "module"})`).
-
-_More to come in this section._
+The library injects itself as the worker file and then uses dynamic `import()` to load the module. The resulting module is then exposed to the worker’s parent using [Comlink].
 
 ### Can I get a handle to the underlying worker?
 
@@ -50,6 +50,26 @@ const worker = module[workerSymbol];
 worker.terminate();
 ```
 
+### What about browsers without module support in workers?
+
+I tried to make the library work in those environments. It’s possible, but it gets messy. I welcome PRs (and preferably a preceding issue to discuss the design) on this problem!
+
+### How do I feature-detect module support in workers?
+
+The snippet that’s [somewhat endorsed by the WHATWG][esm worker detection] is the following:
+
+```js
+let supportsModuleWorker = false;
+const workerURL = URL.createObjectURL(new Blob([""]));
+const options = {
+  get type() {
+    supportsModuleWorker = true;
+  }
+};
+new Worker(workerURL, options).terminate();
+URL.revokeObjectURL(workerURL);
+```
+
 ---
 
 License Apache-2.0
@@ -57,3 +77,5 @@ License Apache-2.0
 [comlink]: https://github.com/GoogleChromeLabs/comlink
 [@_developit]: https://twitter.com/_developit
 [@dassurma]: https://twitter.com/dassurma
+[modules in workers]: https://wpt.fyi/results/workers/modules/dedicated-worker-import.any.html?label=master&product=chrome%5Bstable%5D&product=firefox%5Bstable%5D&product=safari%5Bstable%5D&product=chrome%5Bexperimental%5D&product=firefox%5Bexperimental%5D&product=safari%5Bexperimental%5D&aligned
+[esm worker detection]: https://github.com/whatwg/html/issues/5325
