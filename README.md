@@ -4,6 +4,8 @@ It’s like `import()`, but runs the module in a worker.
 
 This library is a love-child of [@_developit] and [@dassurma].
 
+Total size: 1.7K brotli’d (including [Comlink]).
+
 **Requires [modules in workers], which are currently only implemented in Chrome!**
 
 ## Usage

@@ -15,7 +15,7 @@ import nodeResolve from "rollup-plugin-node-resolve";
 import { terser } from "rollup-plugin-terser";
 
 export default {
-  input: "src/index.js",
+  input: "src/import-from-worker.js",
   output: {
     file: "dist/import-from-worker.js",
     format: "esm"
