@@ -1,10 +1,10 @@
-# import-from-worker
+# importFromWorker()
 
 It’s like `import()`, but runs the module in a worker.
 
 This library is a love-child of [@_developit] and [@dassurma].
 
-**Requires [modules in workers]!**
+**Requires [modules in workers], which are currently only implemented in Chrome!**
 
 ## Usage
 
@@ -28,11 +28,23 @@ console.log(await add(40, 2));
 // ...
 ```
 
+You can also use `importFromWorker()` from a CORS-enabled CDN like [JSDelivr] or [unpkg]:
+
+```js
+import importFromWorker from "https://cdn.jsdelivr.net/npm/import-from-worker@latest/dist/import-from-worker.js";
+```
+
+You can [remix this glitch](glitch), if you like.
+
 ## Q&A
 
 ### How does it work?
 
-The library injects itself as the worker file and then uses dynamic `import()` to load the module. The resulting module is then exposed to the worker’s parent using [Comlink].
+The library injects itself as the worker file and then uses dynamic `import()` to load the module. The resulting module is then exposed to the worker’s parent using [Comlink]. All guidance about callbacks and transferables from Comlink applies to this library as well. For adjustments, the library re-exports Comlink:
+
+```js
+import importFromWorker, { Comlink } from "import-from-worker";
+```
 
 ### Can I get a handle to the underlying worker?
 
@@ -79,3 +91,6 @@ License Apache-2.0
 [@dassurma]: https://twitter.com/dassurma
 [modules in workers]: https://wpt.fyi/results/workers/modules/dedicated-worker-import.any.html?label=master&product=chrome%5Bstable%5D&product=firefox%5Bstable%5D&product=safari%5Bstable%5D&product=chrome%5Bexperimental%5D&product=firefox%5Bexperimental%5D&product=safari%5Bexperimental%5D&aligned
 [esm worker detection]: https://github.com/whatwg/html/issues/5325
+[jsdelivr]: https://www.jsdelivr.com/
+[unpkg]: https://unpkg.com/
+[glitch]: https://glitch.com/edit/#!/import-from-worker-example

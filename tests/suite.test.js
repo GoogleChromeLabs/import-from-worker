@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-import importFromWorker from "/base/dist/import-from-worker.js";
+import importFromWorker, { Comlink } from "/base/dist/import-from-worker.js";
 
 describe("importFromWorker", function() {
   beforeEach(function() {});
@@ -26,5 +26,16 @@ describe("importFromWorker", function() {
   it("works with relative paths", async function() {
     const { add } = await importFromWorker("./fixtures/arithmetic.js");
     expect(await add(40, 2)).to.equal(42);
+  });
+
+  it("works with Comlink functions", function(done) {
+    importFromWorker("./fixtures/callback.js").then(({ callWith42 }) => {
+      callWith42(
+        Comlink.proxy(v => {
+          expect(v).to.equal(42);
+          done();
+        })
+      );
+    });
   });
 });
