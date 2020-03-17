@@ -21,10 +21,10 @@ export default {
     format: "esm"
   },
   plugins: [
-    nodeResolve()
-    // terser({
-    //   mangle: true,
-    //   compress: true
-    // })
+    nodeResolve(),
+    terser({
+      mangle: true,
+      compress: true
+    })
   ]
 };
