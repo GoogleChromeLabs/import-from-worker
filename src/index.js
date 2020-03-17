@@ -43,7 +43,14 @@ export default async function importFromWorker(
   path,
   { name, base = getBase() } = {}
 ) {
-  const worker = new Worker(import.meta.url, { type: "module", name });
+  // Module workers can technically import cross-origin scripts,
+  // but due to a bug in Chrome, they currently can’t.
+  // https://html.spec.whatwg.org/multipage/workers.html#module-worker-example
+  //
+  // H/T @jaffathecake
+  const blob = await fetch(import.meta.url).then(r => r.blob());
+  const blobURL = URL.createObjectURL(blob);
+  const worker = new Worker(blobURL, { type: "module", name });
   await expectMessage(worker, "waiting");
   worker.postMessage(new URL(path, base).toString());
   await expectMessage(worker, "ready");
