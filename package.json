@@ -27,7 +27,7 @@
     "karma-safari-launcher": "^1.0.0",
     "karma-safaritechpreview-launcher": "^2.0.2",
     "lint-staged": "^10.0.8",
-    "mocha": "^7.1.0",
+    "mocha": "^11.7.5",
     "prettier": "^1.19.1"
   },
   "husky": {
